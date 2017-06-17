@@ -11,6 +11,12 @@ module TypeWrapper
                             end
 
   def self.[](type, *modules)
+    raise TypeError, "wrong argument type (expected Class)" unless Class === type
+    raise TypeError, "wrong argument type (expected Module(s))" unless modules.all? { |mod| mod.class == Module }
+    raise ArgumentError, "wrong number of arguments (given 1, expected 2+)" if modules.empty?
+    raise ArgumentError, "Anonymous Class not supported" if type.name.nil?
+    raise ArgumentError, "Anonymous Module(s) not supported" if modules.any? { |mod| mod.name.nil? }
+
     FOR[type, *modules]
   end
 
