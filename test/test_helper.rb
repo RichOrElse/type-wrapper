@@ -1,0 +1,4 @@
+$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
+require "type_wrapper"
+
+require "minitest/autorun"
