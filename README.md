@@ -1,8 +1,6 @@
 # TypeWrapper
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/type_wrapper`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Delegator pattern in Ruby without object schizophrenia. Because Object#extend at runtime is evil.
 
 ## Installation
 
@@ -22,7 +20,40 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+module ToArray
+  def to_a
+    [self]
+  end
+end
+
+module ToString
+  def to_s
+    "#{self}"
+  end
+end
+
+Person = Struct.new(:name)
+
+PersonPresenter = TypeWrapper[Person, ToArray, ToString]
+
+peter = PersonPresenter.new(Person.new('Peter'))
+peter.to_a
+```
+
+## Pros
+
+* Five (5) times faster than [Object#extend](https://apidock.com/ruby/Object/extend).
+* Delegation without [self schizophrenia](https://en.wikipedia.org/wiki/Schizophrenia_(object-oriented_programming)).
+* Allows [DCI](http://dci.github.io/) in Ruby without [blowing the method cache at run time](https://tonyarcieri.com/dci-in-ruby-is-completely-broken).
+
+## Cons
+
+* Three (3) times slower than calling class method. [See benchmark.](https://github.com/RichOrElse/wrapper-based/tree/master/examples/benchmark.rb)
+* [Procedural code](https://en.wikipedia.org/wiki/Procedural_programming) inside Mixin is broken.
+* Methods applied by [Object#extend](https://apidock.com/ruby/Object/extend) takes precedence over Mixin methods.
+* Will not work with anonymous Class and Mixins.
+
 
 ## Development
 
@@ -32,7 +63,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/type_wrapper.
+Bug reports and pull requests are welcome on GitHub at https://github.com/RichOrElse/type_wrapper.
 
 ## License
 
