@@ -1,5 +1,7 @@
 # TypeWrapper
 
+[![Gem Version](https://badge.fury.io/rb/type_wrapper.svg)](https://badge.fury.io/rb/type_wrapper)
+
 Delegator pattern in Ruby without object schizophrenia. Because Object#extend at runtime is evil.
 
 ## Installation
