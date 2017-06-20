@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Ritchie Paul Buitre"]
   spec.email         = ["ritchie@richorelse.com"]
 
-  spec.summary       = "Another Delegator"
+  spec.summary       = "Delegator pattern in Ruby without object schizophrenia. Because Object#extend at runtime is evil."
   spec.homepage      = "https://github.com/RichOrElse/type-wrapper/"
   spec.license       = "MIT"
 
