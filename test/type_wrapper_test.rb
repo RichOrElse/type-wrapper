@@ -32,7 +32,7 @@ class TypeWrapperTest < Minitest::Test
   end
 
   def test_with_anonymous_class_and_modules
-    assert_raises(ArgumentError) { TypeWrapper[Class.new, ExampleMixin] }
-    assert_raises(ArgumentError) { TypeWrapper[ExampleClass, ExampleMixin, Module.new] }
+    assert Class, TypeWrapper[Class.new, ExampleMixin].class
+    assert Class, TypeWrapper[ExampleClass, ExampleMixin, Module.new].class
   end
 end

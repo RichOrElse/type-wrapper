@@ -45,15 +45,14 @@ peter.to_a
 
 * Five (5) times faster than [Object#extend](https://apidock.com/ruby/Object/extend).
 * Delegation without [self schizophrenia](https://en.wikipedia.org/wiki/Schizophrenia_(object-oriented_programming)).
+* [Decorator Pattern](https://en.wikipedia.org/wiki/Decorator_pattern) with multiple traits.
 * Allows [DCI](http://dci.github.io/) in Ruby without [blowing the method cache at run time](https://tonyarcieri.com/dci-in-ruby-is-completely-broken).
 
 ## Cons
 
 * Three (3) times slower than calling class method. [See benchmark.](https://github.com/RichOrElse/wrapper-based/tree/master/examples/benchmark.rb)
-* [Procedural code](https://en.wikipedia.org/wiki/Procedural_programming) inside Mixin is broken.
+* [Procedural code](https://en.wikipedia.org/wiki/Procedural_programming) inside Mixin is broken, methods scoped in Mixin cannot directly call another method in the same scope of the Mixin.
 * Methods applied by [Object#extend](https://apidock.com/ruby/Object/extend) takes precedence over Mixin methods.
-* Will not work with anonymous Class and Mixins.
-
 
 ## Development
 
