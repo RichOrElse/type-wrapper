@@ -23,10 +23,10 @@ module TypeWrapper
           include TypeWrapper
           const_set :Type, type
           const_set :BEHAVIORS, behaviors
+          const_set :Trait, Module.new { refine(type) { prepend(*behaviors.reverse) } }
           forwarding = behaviors.flat_map(&:public_instance_methods) - public_instance_methods
           code = forwarding.uniq.map { |meth| "def %{meth}(*args, &block) __getobj__.%{meth}(*args, &block) end" % { meth: meth } }
-          code.unshift "using Module.new { refine(Type) { prepend *BEHAVIORS.reverse } }"
-          class_eval code.join('; ')
+          class_eval code.unshift("using Trait").join("\n")
         end
       end
 end
