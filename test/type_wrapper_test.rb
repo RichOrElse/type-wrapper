@@ -1,6 +1,10 @@
 require "test_helper"
 
 class TypeWrapperTest < Minitest::Test
+  def test_that_it_has_a_version_number
+    refute_nil ::TypeWrapper::VERSION
+  end
+
   class ExampleClass
     def foo; 42; end
   end
@@ -9,16 +13,8 @@ class TypeWrapperTest < Minitest::Test
     def foo; 43; end
   end
 
-  def setup
-    @wrapper = TypeWrapper[ExampleClass, ExampleMixin]
-  end
-
-  def test_that_it_has_a_version_number
-    refute_nil ::TypeWrapper::VERSION
-  end
-
-  def test_it_does_something_useful
-    assert 43, @wrapper.new(ExampleClass.new).foo
+  def test_wraps_objects
+    assert_equal 43, TypeWrapper[ExampleClass, ExampleMixin].new(ExampleClass.new).foo
   end
 
   def test_with_one_argument
@@ -34,5 +30,18 @@ class TypeWrapperTest < Minitest::Test
   def test_with_anonymous_class_and_modules
     assert Class, TypeWrapper[Class.new, ExampleMixin].class
     assert Class, TypeWrapper[ExampleClass, ExampleMixin, Module.new].class
+  end
+
+  module First
+    def number; 1 end
+  end
+
+  module Second
+    def number; 2 end
+  end
+
+  def test_last_mixin_methods_precedes_previous_mixins
+    example =  TypeWrapper[ExampleClass, First, Second].new(ExampleClass.new)
+    assert_equal 2, example.number
   end
 end
