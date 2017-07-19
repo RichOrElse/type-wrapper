@@ -1,6 +1,7 @@
 # TypeWrapper
 
 [![Gem Version](https://badge.fury.io/rb/type_wrapper.svg)](https://badge.fury.io/rb/type_wrapper)
+[![Build Status](https://travis-ci.org/RichOrElse/type-wrapper.svg?branch=master)](https://travis-ci.org/RichOrElse/type-wrapper)
 
 Delegator pattern in Ruby without object schizophrenia. Because Object#extend at runtime is evil.
 
@@ -21,6 +22,10 @@ Or install it yourself as:
     $ gem install type_wrapper
 
 ## Usage
+
+### TypeWrapper
+
+Construct a delegator class using square brackets '[]' method with type as the first argument followed by mixins. 
 
 ```ruby
 module ToArray
@@ -43,18 +48,39 @@ peter = PersonPresenter.new(Person.new('Peter'))
 peter.to_a
 ```
 
+### TypeWrapper::Module
+
+Define a block with the 'new' method and pass the 'mod' parameter to 'using' keyword.
+
+```ruby
+AwesomeSinging = TypeWrapper::Module.new do |mod| using mod
+  def sing
+    "#{name} sings #{song}"
+  end
+
+  def song
+    "Everything is AWESOME!!!"
+  end
+end
+
+Lego = Struct.new(:name)
+
+using AwesomeSinging[Lego]
+Lego.new("Emmet").sing
+```
+
 ## Pros
 
 * Five (5) times faster than [Object#extend](https://apidock.com/ruby/Object/extend).
 * Delegation without [self schizophrenia](https://en.wikipedia.org/wiki/Schizophrenia_(object-oriented_programming)).
 * [Decorator Pattern](https://en.wikipedia.org/wiki/Decorator_pattern) with multiple traits.
-* Allows [DCI](http://dci.github.io/) in Ruby without [blowing the method cache at run time](https://tonyarcieri.com/dci-in-ruby-is-completely-broken).
+* Allows [DCI](https://github.com/RichOrElse/wrapper-based/) in Ruby without [blowing the method cache at run time](https://tonyarcieri.com/dci-in-ruby-is-completely-broken).
 
 ## Cons
 
+* Must use TypeWrapper::Module to allow procedural code in mixins.
 * Three (3) times slower than calling class method. [See benchmark.](https://github.com/RichOrElse/wrapper-based/tree/master/examples/benchmark.rb)
-* [Procedural code](https://en.wikipedia.org/wiki/Procedural_programming) inside Mixin is broken, methods scoped in Mixin cannot directly call another method in the same scope of the Mixin.
-* Methods applied by [Object#extend](https://apidock.com/ruby/Object/extend) takes precedence over Mixin methods.
+* Methods applied with [Object#extend](https://apidock.com/ruby/Object/extend) takes precedence over Mixin methods.
 
 ## Development
 
