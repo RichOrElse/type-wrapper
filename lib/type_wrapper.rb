@@ -1,34 +1,26 @@
 require "type_wrapper/version"
 require "type_wrapper/module"
+require "type_wrapper/forwarding"
 require 'delegate'
 
 module TypeWrapper
-  alias_method :initialize, def __setobj__(obj)
-                              @delegate_tw_obj = obj # change delegation object
-                            end
-
-  alias_method :~@,         def __getobj__
-                              @delegate_tw_obj # return object we are delegating to
-                            end
+  using Module::Refines
 
   def self.[](*types)
     raise TypeError, "wrong argument type (expected Module(s))" if types.include?(nil)
     raise ArgumentError, "wrong number of arguments (given #{types.size}, expected 2+)" if types.size < 2
 
-    FOR[*types]
-  end
-  
-  using Module::Refines
+    type, *behaviors = *types
 
-  FOR = -> type, *behaviors do
-        Class.new(Delegator) do
-          include TypeWrapper
-          const_set :Type, type
-          const_set :BEHAVIORS, behaviors
-          const_set :Trait, Module.new { behaviors.each { |mod| include mod.refines(type) } }
-          forwarding = behaviors.flat_map(&:public_instance_methods) - public_instance_methods
-          code = forwarding.uniq.map { |meth| "def %{meth}(*args, &block) __getobj__.%{meth}(*args, &block) end" % { meth: meth } }
-          class_eval code.unshift("using Trait").join("\n")
-        end
+    raise ArgumentError, "Module(s) has no public methods defined" if behaviors.flat_map(&:public_instance_methods).empty?
+
+    Class.new DelegateClass(type) do
+      alias_method :~@, :__getobj__
+      define_method(:inspect) { "#< #{self.class.name || behaviors} #{__getobj__} #>" }
+
+      behaviors.each do |mod|
+        include Forwarding.new mod.refines(type), *mod.public_instance_methods, to: :__getobj__
       end
+    end
+  end
 end

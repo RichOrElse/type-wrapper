@@ -28,8 +28,13 @@ class TypeWrapperTest < Minitest::Test
   end
 
   def test_with_anonymous_class_and_modules
-    assert Class, TypeWrapper[Class.new, ExampleMixin].class
-    assert Class, TypeWrapper[ExampleClass, ExampleMixin, Module.new].class
+    assert_kind_of Class, TypeWrapper[Class.new, ExampleMixin].class
+    assert_kind_of Class, TypeWrapper[ExampleClass, ExampleMixin, Module.new { def foo; end }].class
+  end
+
+  def test_with_methodless_module
+    error = assert_raises(ArgumentError) { TypeWrapper[ExampleClass, Module.new] }
+    assert_equal "Module(s) has no public methods defined", error.message
   end
 
   module First
@@ -43,5 +48,17 @@ class TypeWrapperTest < Minitest::Test
   def test_last_mixin_methods_precedes_previous_mixins
     example =  TypeWrapper[ExampleClass, First, Second].new(ExampleClass.new)
     assert_equal 2, example.number
+  end
+
+  def test_tilde
+    wrapper = TypeWrapper[String, Comparable]
+    unwrapped = "string"
+    wrapped = wrapper.new unwrapped
+    assert_same unwrapped, ~wrapped
+  end
+
+  def test_inspect
+    wrapper = TypeWrapper[String, Comparable]
+    assert_equal '#< [Comparable] Awesome #>', wrapper.new('Awesome').inspect
   end
 end

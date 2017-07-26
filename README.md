@@ -69,6 +69,40 @@ using AwesomeSinging[Lego]
 Lego.new("Emmet").sing
 ```
 
+### TypeWrapper::Forwarding
+
+Creates a Module that delegates Refinements methods (forwarding) to a target object.
+
+```ruby
+Lego = Struct.new(:name)
+
+module LoudSpeaking
+  def speak(words)
+    "#{name}: #{words.upcase}!!!"
+  end
+
+  def say(words)
+    "#{name}: #{words.upcase}!!!"
+  end
+end
+
+# Refinements
+module LoudSpeakingLego
+  refine Lego do
+    include LoudSpeaking
+  end
+end
+
+# target: speaker
+class LoudLego < Struct.new(:speaker)
+  include TypeWrapper::Forwarding[LoudSpeakingLego, :speak, :say, to: :speaker]
+end
+
+batman = Lego.new('Batman')
+loud_lego = LoudLego.new(batman)
+loud_lego.speak("I'm Batman") # => "Batman: I'M BATMAN!!!"
+```
+
 ## Pros
 
 * Five (5) times faster than [Object#extend](https://apidock.com/ruby/Object/extend).
